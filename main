@@ -1,0 +1,67 @@
+import asyncio
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
+import csv
+
+global current_game_value
+current_game_value = None
+global previous_game_value
+previous_game_value = None
+global distance
+distance = None
+
+def write_to_csv(variable1):
+    global distance
+    with open('data.csv','a', newline='',encoding='UTF-8') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow([variable1])
+
+
+
+async def parser():
+    global previous_game_value
+    global current_game_value
+    global distance
+    chrome_driver_path = r'C:\Users\bayda\PycharmProjects\BotCSFAIL\.venv\chromedriver-win64\chromedriver.exe'
+    service = Service(chrome_driver_path)
+
+    options = Options()
+    options.add_argument('--headless')
+
+    user_agent = UserAgent()
+    fake_user_agent = user_agent.random
+    options.add_argument(f'user-agent={fake_user_agent}')
+
+    driver = webdriver.Chrome(service=service, options=options)
+    driver.get("https://2cs.fail/ru/crash")
+    distance = 0
+
+    while True:
+        global previous_game_value
+        WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, 'history__game')))
+        current_game_value = driver.find_element(By.CLASS_NAME, 'history__game').text.strip()
+
+        if current_game_value != previous_game_value:
+            current_game_value.strip()
+            current_game_value = current_game_value.rstrip('x')
+            current_game_value = float(current_game_value)
+
+            if current_game_value != previous_game_value:
+                if current_game_value >= 10:
+                    write_to_csv(distance)
+                    distance = 0
+                    previous_game_value = current_game_value
+                else:
+                    distance += 1
+                    previous_game_value = current_game_value
+        await asyncio.sleep(10)
+
+
+asyncio.run(parser())
+
