@@ -1,0 +1,52 @@
+import csv
+
+with open('data.csv', 'r', newline='', encoding='UTF-8') as file:
+    count_greater_than_10 = 0
+    count_less_than_10 = 0
+
+    range_greater_than_10 = 0
+    range_lees_then_10 = 0
+
+    q_1 = 0
+    q_2 = 0
+
+    range_greater_than_5 = 0
+    range_lees_then_5 = 0
+
+    reader = csv.reader(file)
+    header = next(reader)
+    calculate = []
+    for row in reader:
+        # Преобразование первого элемента строки в целое число
+        calculate.append(int(row[0]))
+    print(calculate)
+    for num in calculate:
+        if num > 10:
+            count_greater_than_10 += 1
+        elif num < 10:
+            count_less_than_10 += 1
+
+    print(f"Чисел больше 10: {count_greater_than_10} - {count_less_than_10 * 100 / (count_less_than_10 + count_greater_than_10):.2f}%")
+    print(f"Чисел меньше 10: {count_less_than_10} - {count_greater_than_10 * 100 / (count_less_than_10 + count_greater_than_10):.2f}%")
+
+    for i in calculate:
+        if i > 10:
+            range_greater_than_10 += 1.0
+        elif i < 10:
+            range_lees_then_10 += float((10 - i) / 10)
+    print(f'Заработал {range_lees_then_10:.2f}, Потерял {range_greater_than_10:.2f}')
+
+    for i in calculate:
+        if i < 10:
+            if i >= 6:
+                q_1 += 1
+            elif i <= 5:
+                q_2 += 1
+    print(f'больше 5: {q_1}, меньше 5: {q_2}')
+
+    for i in calculate:
+        if i > 5:
+            range_greater_than_5 += 0.5
+        elif i < 10:
+            range_lees_then_5 += float((5 - i) / 5)
+    print(f'Заработал {range_lees_then_5:.2f}, Потерял {range_greater_than_5:.2f}')
